@@ -6,6 +6,7 @@ import kotlin.LazyKt;
 import net.mamoe.mirai.console.permission.*;
 import net.mamoe.mirai.console.plugin.jvm.JavaPlugin;
 import net.mamoe.mirai.console.plugin.jvm.JvmPluginDescriptionBuilder;
+import net.mamoe.mirai.contact.Group;
 import net.mamoe.mirai.contact.Member;
 import net.mamoe.mirai.contact.User;
 import net.mamoe.mirai.event.Event;
@@ -18,12 +19,12 @@ import net.mamoe.mirai.event.events.GroupMessageEvent;
 public class MistyRecordPlugin extends JavaPlugin {
     public static final MistyRecordPlugin INSTANCE = new MistyRecordPlugin();
 
-    public static final Lazy<Permission> mistyRecordPermission =
+    public static final Lazy<Permission> mistyRecordGroupPermission =
             LazyKt.lazy(() -> {
                try {
                    return PermissionService.getInstance().register(
-                           INSTANCE.permissionId("misty-record-permission"),
-                           "修仙大陆权限组",
+                           INSTANCE.permissionId("misty-record-use-group"),
+                           "修仙大陆群组权限",
                            INSTANCE.getParentPermission()
                    );
                } catch (PermissionRegistryConflictException e) {
@@ -31,14 +32,9 @@ public class MistyRecordPlugin extends JavaPlugin {
                }
             });
 
-    public static boolean hasPermission(User user) {
-        PermitteeId pid;
-        if (user instanceof Member) {
-            pid = new AbstractPermitteeId.ExactMember(((Member) user).getGroup().getId(), user.getId());
-        } else {
-            pid = new AbstractPermitteeId.ExactUser(user.getId());
-        }
-        return PermissionService.hasPermission(pid, mistyRecordPermission.getValue());
+    public static boolean hasMistyUse(Group user) {
+        PermitteeId pid = new AbstractPermitteeId.ExactGroup(user.getId());
+        return PermissionService.hasPermission(pid, mistyRecordGroupPermission.getValue());
     }
 
     private MistyRecordPlugin() {
@@ -55,7 +51,7 @@ public class MistyRecordPlugin extends JavaPlugin {
         eventChannel.subscribeAlways(FriendMessageEvent.class, g -> {
             getLogger().info(g.getMessage().contentToString());
         });
-        mistyRecordPermission.getValue();//registry permission
+        mistyRecordGroupPermission.getValue();//registry permission
     }
 
     @Override
