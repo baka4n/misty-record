@@ -51,6 +51,7 @@ public class MistyRecordPlugin extends JavaPlugin {
         eventChannel.subscribeAlways(FriendMessageEvent.class, g -> {
             getLogger().info(g.getMessage().contentToString());
         });
+
         mistyRecordGroupPermission.getValue();//registry permission
     }
 
