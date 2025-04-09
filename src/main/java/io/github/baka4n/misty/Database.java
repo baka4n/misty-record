@@ -4,20 +4,23 @@ import com.github.artbits.quickio.api.Collection;
 import com.github.artbits.quickio.api.JDB;
 import com.github.artbits.quickio.core.Config;
 import com.github.artbits.quickio.core.QuickIO;
+import io.github.baka4n.misty.io.Economy;
 import io.github.baka4n.misty.io.Entity;
 import net.mamoe.mirai.contact.Group;
 import net.mamoe.mirai.contact.User;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public class Database implements AutoCloseable {
-
+    public static final Map<Long, Database> groupDatabase = new HashMap<>();
     public final JDB db;
-    public Database(String path, Group group, User user) {
+    public Database(String path, Group group) {
         db = QuickIO.db(Config.of(config -> {
-            config.name(String.valueOf(user.getId()));
-            config.path(path + "/" + group.getId());
+            config.name(String.valueOf(group.getId()));
+            config.path(path);
         }));
     }
 

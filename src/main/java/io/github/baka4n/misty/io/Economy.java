@@ -11,7 +11,6 @@ import java.util.function.Consumer;
 @Getter @Setter
 @Accessors(chain = true, fluent = true)
 public class Economy extends Entity {
-    public boolean isGroup;
     public long uid;
     public BigDecimal mistyCoin;
     public BigDecimal lowerSpiritStone;
@@ -34,9 +33,8 @@ public class Economy extends Entity {
     }
 
     @Override
-    public Entity copy() {
+    public Economy copy() {
         return new Economy()
-                .isGroup(isGroup)
                 .uid(uid)
                 .mistyCoin(mistyCoin)
                 .lowerSpiritStone(lowerSpiritStone)

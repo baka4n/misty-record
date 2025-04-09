@@ -1,20 +1,23 @@
 package io.github.baka4n.misty;
 
 import com.google.auto.service.AutoService;
+import io.github.baka4n.misty.command.BaseCommand;
+import io.github.baka4n.misty.command.StartXiuXianCommand;
 import kotlin.Lazy;
 import kotlin.LazyKt;
+
 import net.mamoe.mirai.console.permission.*;
 import net.mamoe.mirai.console.plugin.jvm.JavaPlugin;
 import net.mamoe.mirai.console.plugin.jvm.JvmPluginDescriptionBuilder;
 import net.mamoe.mirai.contact.Group;
 import net.mamoe.mirai.contact.Member;
-import net.mamoe.mirai.contact.User;
 import net.mamoe.mirai.event.Event;
 import net.mamoe.mirai.event.EventChannel;
 import net.mamoe.mirai.event.GlobalEventChannel;
-import net.mamoe.mirai.event.events.FriendMessageEvent;
 import net.mamoe.mirai.event.events.GroupMessageEvent;
 import net.mamoe.mirai.message.data.MessageChain;
+
+import java.util.LinkedList;
 
 @AutoService(JavaPlugin.class)
 public class MistyRecordPlugin extends JavaPlugin {
@@ -38,6 +41,12 @@ public class MistyRecordPlugin extends JavaPlugin {
         return PermissionService.hasPermission(pid, mistyRecordGroupPermission.getValue());
     }
 
+    public static final LinkedList<BaseCommand> COMMANDS = new LinkedList<>();
+
+    public static void registerCommand(BaseCommand command) {
+        COMMANDS.add(command);
+    }
+
     private MistyRecordPlugin() {
         super(new JvmPluginDescriptionBuilder("io.github.baka4n.misty-record", "1.0.0").info("EG").build());
     }
@@ -46,15 +55,25 @@ public class MistyRecordPlugin extends JavaPlugin {
     public void onEnable() {
         getLogger().info("Misty record plugin enabled");
         EventChannel<Event> eventChannel = GlobalEventChannel.INSTANCE.parentScope(this);
+        registerCommand(new StartXiuXianCommand());
         eventChannel.subscribeAlways(GroupMessageEvent.class, g -> {
+
             getLogger().info(g.getMessage().contentToString());
             MessageChain message = g.getMessage();
             Group group = g.getGroup();
-            if (message.contentToString().startsWith("你好亮亮")) {
+            long id = group.getId();
+            if (!Database.groupDatabase.containsKey(id))
+                Database.groupDatabase.put(id, new Database("misty/data", group));
+            String messageString = message.contentToString();
+            for (BaseCommand command : COMMANDS) {
+                command.run(messageString, group, g.getSender());
+            }
+            if (messageString.startsWith("你好亮亮")) {
                 getLogger().info("成功");
-                group.sendMessage(message.contentToString());
+                group.sendMessage(messageString);
             }
         });
+
 //        eventChannel.subscribeAlways(FriendMessageEvent.class, g -> {
 //            getLogger().info(g.getMessage().contentToString());
 //        });
