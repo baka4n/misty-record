@@ -3,6 +3,7 @@ package io.github.baka4n.misty;
 import com.google.auto.service.AutoService;
 import io.github.baka4n.misty.command.BaseCommand;
 import io.github.baka4n.misty.command.StartXiuXianCommand;
+import io.github.baka4n.misty.io.Economy;
 import kotlin.Lazy;
 import kotlin.LazyKt;
 
@@ -55,23 +56,23 @@ public class MistyRecordPlugin extends JavaPlugin {
     public void onEnable() {
         getLogger().info("Misty record plugin enabled");
         EventChannel<Event> eventChannel = GlobalEventChannel.INSTANCE.parentScope(this);
-        registerCommand(new StartXiuXianCommand());
         eventChannel.subscribeAlways(GroupMessageEvent.class, g -> {
 
-            getLogger().info(g.getMessage().contentToString());
             MessageChain message = g.getMessage();
             Group group = g.getGroup();
+            Member user = g.getSender();
             long id = group.getId();
             if (!Database.groupDatabase.containsKey(id))
-                Database.groupDatabase.put(id, new Database("misty/data", group));
+                Database.groupDatabase.put(id, new Database("misty/economy", group));
             String messageString = message.contentToString();
-            for (BaseCommand command : COMMANDS) {
-                command.run(messageString, group, g.getSender());
+            switch (messageString.trim()) {
+                case "开始修仙", "开始飘渺" -> StartXiuXianCommand.run(group, user);
             }
             if (messageString.startsWith("你好亮亮")) {
                 getLogger().info("成功");
                 group.sendMessage(messageString);
             }
+            getLogger().info("debug" + messageString);
         });
 
 //        eventChannel.subscribeAlways(FriendMessageEvent.class, g -> {
@@ -83,6 +84,7 @@ public class MistyRecordPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        Database.groupDatabase.forEach((aLong, database) -> database.close());
         getLogger().info("Misty record plugin disabled");
     }
 }
