@@ -14,6 +14,7 @@ import net.mamoe.mirai.event.EventChannel;
 import net.mamoe.mirai.event.GlobalEventChannel;
 import net.mamoe.mirai.event.events.FriendMessageEvent;
 import net.mamoe.mirai.event.events.GroupMessageEvent;
+import net.mamoe.mirai.message.data.MessageChain;
 
 @AutoService(JavaPlugin.class)
 public class MistyRecordPlugin extends JavaPlugin {
@@ -47,10 +48,16 @@ public class MistyRecordPlugin extends JavaPlugin {
         EventChannel<Event> eventChannel = GlobalEventChannel.INSTANCE.parentScope(this);
         eventChannel.subscribeAlways(GroupMessageEvent.class, g -> {
             getLogger().info(g.getMessage().contentToString());
+            MessageChain message = g.getMessage();
+            Group group = g.getGroup();
+            if (message.contentToString().startsWith("你好亮亮")) {
+                getLogger().info("成功");
+                group.sendMessage(message.contentToString());
+            }
         });
-        eventChannel.subscribeAlways(FriendMessageEvent.class, g -> {
-            getLogger().info(g.getMessage().contentToString());
-        });
+//        eventChannel.subscribeAlways(FriendMessageEvent.class, g -> {
+//            getLogger().info(g.getMessage().contentToString());
+//        });
 
         mistyRecordGroupPermission.getValue();//registry permission
     }
