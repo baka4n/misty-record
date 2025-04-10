@@ -1,12 +1,13 @@
 package io.github.baka4n.misty;
 
 import com.google.auto.service.AutoService;
-import io.github.baka4n.misty.command.BaseCommand;
 import io.github.baka4n.misty.command.StartXiuXianCommand;
-import io.github.baka4n.misty.io.Economy;
 import kotlin.Lazy;
 import kotlin.LazyKt;
 
+import net.mamoe.mirai.console.command.CommandManager;
+import net.mamoe.mirai.console.command.CommandManagerKt;
+import net.mamoe.mirai.console.internal.command.CommandManagerImpl;
 import net.mamoe.mirai.console.permission.*;
 import net.mamoe.mirai.console.plugin.jvm.JavaPlugin;
 import net.mamoe.mirai.console.plugin.jvm.JvmPluginDescriptionBuilder;
@@ -17,8 +18,6 @@ import net.mamoe.mirai.event.EventChannel;
 import net.mamoe.mirai.event.GlobalEventChannel;
 import net.mamoe.mirai.event.events.GroupMessageEvent;
 import net.mamoe.mirai.message.data.MessageChain;
-
-import java.util.LinkedList;
 
 @AutoService(JavaPlugin.class)
 public class MistyRecordPlugin extends JavaPlugin {
@@ -42,11 +41,6 @@ public class MistyRecordPlugin extends JavaPlugin {
         return PermissionService.hasPermission(pid, mistyRecordGroupPermission.getValue());
     }
 
-    public static final LinkedList<BaseCommand> COMMANDS = new LinkedList<>();
-
-    public static void registerCommand(BaseCommand command) {
-        COMMANDS.add(command);
-    }
 
     private MistyRecordPlugin() {
         super(new JvmPluginDescriptionBuilder("io.github.baka4n.misty-record", "1.0.0").info("EG").build());
@@ -54,10 +48,11 @@ public class MistyRecordPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
+
         getLogger().info("Misty record plugin enabled");
         EventChannel<Event> eventChannel = GlobalEventChannel.INSTANCE.parentScope(this);
+        CommandManager.INSTANCE.registerCommand(new StartXiuXianCommand(), false);
         eventChannel.subscribeAlways(GroupMessageEvent.class, g -> {
-
             MessageChain message = g.getMessage();
             Group group = g.getGroup();
             Member user = g.getSender();
@@ -65,9 +60,9 @@ public class MistyRecordPlugin extends JavaPlugin {
             if (!Database.groupDatabase.containsKey(id))
                 Database.groupDatabase.put(id, new Database("misty/economy", group));
             String messageString = message.contentToString();
-            switch (messageString.trim()) {
-                case "开始修仙", "开始飘渺" -> StartXiuXianCommand.run(group, user);
-            }
+//            switch (messageString.trim()) {
+//                case "开始修仙", "开始飘渺" -> StartXiuXianCommand.run(group, user);
+//            }
             if (messageString.startsWith("你好亮亮")) {
                 getLogger().info("成功");
                 group.sendMessage(messageString);
