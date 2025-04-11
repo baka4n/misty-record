@@ -1,14 +1,11 @@
 package io.github.baka4n.misty;
 
 import com.google.auto.service.AutoService;
-import io.github.baka4n.misty.command.InfoCommand;
-import io.github.baka4n.misty.command.StartXiuXianCommand;
+import io.github.baka4n.misty.command.*;
+import io.github.baka4n.misty.io.json.BaseConfig;
 import kotlin.Lazy;
 import kotlin.LazyKt;
 
-import net.mamoe.mirai.console.command.CommandManager;
-import net.mamoe.mirai.console.command.CommandManagerKt;
-import net.mamoe.mirai.console.internal.command.CommandManagerImpl;
 import net.mamoe.mirai.console.permission.*;
 import net.mamoe.mirai.console.plugin.jvm.JavaPlugin;
 import net.mamoe.mirai.console.plugin.jvm.JvmPluginDescriptionBuilder;
@@ -23,7 +20,6 @@ import net.mamoe.mirai.message.data.MessageChain;
 @AutoService(JavaPlugin.class)
 public class MistyRecordPlugin extends JavaPlugin {
     public static final MistyRecordPlugin INSTANCE = new MistyRecordPlugin();
-
     public static final Lazy<Permission> mistyRecordGroupPermission =
             LazyKt.lazy(() -> {
                try {
@@ -47,31 +43,39 @@ public class MistyRecordPlugin extends JavaPlugin {
         super(new JvmPluginDescriptionBuilder("io.github.baka4n.misty-record", "1.0.0").info("EG").build());
     }
 
+
+
     @Override
     public void onEnable() {
 
+        reloadPluginConfig(BaseConfig.BASE_CONFIG);
         getLogger().info("Misty record plugin enabled");
         EventChannel<Event> eventChannel = GlobalEventChannel.INSTANCE.parentScope(this);
-
         eventChannel.subscribeAlways(GroupMessageEvent.class, g -> {
             MessageChain message = g.getMessage();
             Group group = g.getGroup();
             Member user = g.getSender();
             long id = group.getId();
-            if (!Database.groupDatabase.containsKey(id))
-                Database.groupDatabase.put(id, new Database("misty/economy", group));
-            if (!Database.groupLevelDatabase.containsKey(id))
-                Database.groupLevelDatabase.put(id, new Database("misty/level", group));
+            if (!Database.databases.containsKey(id))
+                Database.databases.put(id,
+                        new Databases(group,
+                                "misty/economy",
+                                "misty/level",
+                                "misty/info"));
+
             String messageString = message.contentToString();
             switch (messageString.trim()) {
                 case "#开始修仙", "#开始飘渺" -> StartXiuXianCommand.onCommand(group, user);
                 case "#飘渺面板", "#个人信息" -> InfoCommand.onCommand(group, user);
+                case "#我命由我不由天" -> RestartCommand.onCommand(group, user);
+                case "#魂归故里", "寂灭" -> SuicidedCommand.onCommand(group, user);
+                case "#飘渺告示", "飘渺帮助" -> HelpCommand.onCommand(group);
             }
             if (messageString.startsWith("你好亮亮")) {
                 getLogger().info("成功");
                 group.sendMessage(messageString);
             }
-            getLogger().info("debug" + messageString);
+            getLogger().info(messageString);
         });
 
 //        eventChannel.subscribeAlways(FriendMessageEvent.class, g -> {
@@ -83,7 +87,7 @@ public class MistyRecordPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        Database.groupDatabase.forEach((aLong, database) -> database.close());
+        Database.databases.forEach((aLong, database) -> database.close());
         getLogger().info("Misty record plugin disabled");
     }
 }

@@ -7,6 +7,7 @@ import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Random;
 
 @Getter
 @Setter
@@ -20,14 +21,16 @@ public class Level extends Entity implements ILevel<Level> {
     public BigInteger smallIntestine, gall, gastric, largeIntestine, bladder, trifocals;
     //小肠、胆、胃、大肠、膀胱, 三焦 六腑
 
+    public static final Random random = new Random();
+
     public static Level DEFAULT() {
         return new Level()
                 .qiTraining(BigInteger.ONE)
-                .gold(BigDecimal.valueOf(Math.random()))
-                .wood(BigDecimal.valueOf(Math.random()))
-                .water(BigDecimal.valueOf(Math.random()))
-                .fire(BigDecimal.valueOf(Math.random()))
-                .earth(BigDecimal.valueOf(Math.random()))
+                .gold(BigDecimal.valueOf(random.nextInt(0, 11)))
+                .wood(BigDecimal.valueOf(random.nextInt(0, 11)))
+                .water(BigDecimal.valueOf(random.nextInt(0, 11)))
+                .fire(BigDecimal.valueOf(random.nextInt(0, 11)))
+                .earth(BigDecimal.valueOf(random.nextInt(0, 11)))
                 .forgingBody(BigInteger.ONE)
                 .heart(BigInteger.ZERO)
                 .liver(BigInteger.ZERO)
