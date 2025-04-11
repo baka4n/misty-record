@@ -16,6 +16,7 @@ import java.util.function.Predicate;
 
 public class Database implements AutoCloseable {
     public static final Map<Long, Database> groupDatabase = new HashMap<>();
+    public static final Map<Long, Database> groupLevelDatabase = new HashMap<>();
     public final JDB db;
     public Database(String path, Group group) {
         db = QuickIO.db(Config.of(config -> {

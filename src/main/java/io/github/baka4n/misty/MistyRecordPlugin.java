@@ -1,6 +1,7 @@
 package io.github.baka4n.misty;
 
 import com.google.auto.service.AutoService;
+import io.github.baka4n.misty.command.InfoCommand;
 import io.github.baka4n.misty.command.StartXiuXianCommand;
 import kotlin.Lazy;
 import kotlin.LazyKt;
@@ -51,7 +52,7 @@ public class MistyRecordPlugin extends JavaPlugin {
 
         getLogger().info("Misty record plugin enabled");
         EventChannel<Event> eventChannel = GlobalEventChannel.INSTANCE.parentScope(this);
-        CommandManager.INSTANCE.registerCommand(new StartXiuXianCommand(), false);
+
         eventChannel.subscribeAlways(GroupMessageEvent.class, g -> {
             MessageChain message = g.getMessage();
             Group group = g.getGroup();
@@ -59,10 +60,13 @@ public class MistyRecordPlugin extends JavaPlugin {
             long id = group.getId();
             if (!Database.groupDatabase.containsKey(id))
                 Database.groupDatabase.put(id, new Database("misty/economy", group));
+            if (!Database.groupLevelDatabase.containsKey(id))
+                Database.groupLevelDatabase.put(id, new Database("misty/level", group));
             String messageString = message.contentToString();
-//            switch (messageString.trim()) {
-//                case "开始修仙", "开始飘渺" -> StartXiuXianCommand.run(group, user);
-//            }
+            switch (messageString.trim()) {
+                case "#开始修仙", "#开始飘渺" -> StartXiuXianCommand.onCommand(group, user);
+                case "#飘渺面板", "#个人信息" -> InfoCommand.onCommand(group, user);
+            }
             if (messageString.startsWith("你好亮亮")) {
                 getLogger().info("成功");
                 group.sendMessage(messageString);
