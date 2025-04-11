@@ -51,4 +51,7 @@ public interface ILevel<T extends Level> {
         }
 
     }
+    default String levelStringBody() {
+        return "圣体";
+    }
 }
