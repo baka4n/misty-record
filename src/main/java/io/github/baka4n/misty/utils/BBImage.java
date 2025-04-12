@@ -84,8 +84,16 @@ public class BBImage extends BufferedImage {
         return this;
     }
 
+    public BBImage drawImage(Image img, int x, int y, int width, int height) {
+        graphics.drawImage(img, x, y, width, height, null);
+        return this;
+    }
+
 
     public BBImage graphics() {
+        if (graphics != null) {
+            graphics.dispose();
+        }
         graphics = this.createGraphics();
         return this;
     }

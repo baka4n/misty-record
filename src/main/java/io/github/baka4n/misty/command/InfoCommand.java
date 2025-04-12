@@ -10,6 +10,7 @@ import io.github.baka4n.misty.MistyRecordPlugin;
 import io.github.baka4n.misty.io.Economy;
 import io.github.baka4n.misty.io.Info;
 import io.github.baka4n.misty.io.Level;
+import io.github.baka4n.misty.utils.BBImage;
 import io.github.baka4n.misty.utils.Utils;
 import lombok.SneakyThrows;
 import net.mamoe.mirai.contact.Group;
@@ -18,12 +19,21 @@ import net.mamoe.mirai.message.data.*;
 import net.mamoe.mirai.utils.ExternalResource;
 import org.jetbrains.annotations.NotNull;
 
+import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.time.LocalDate;
+import java.util.Base64;
+import java.util.Iterator;
 import java.util.List;
 
 public class InfoCommand extends Utils {
@@ -103,13 +113,19 @@ public class InfoCommand extends Utils {
 //        ForwardMessageBuilder pack = new ForwardMessageBuilder(group);
 //        pack.add(114514L, "飘渺宗主", new PlainText("a"));
 //        ForwardMessage packBuild = pack.build();
-        URL resource = MistyRecordPlugin.INSTANCE.getClass().getResource("bg.png");
+        URL resource = InfoCommand.class.getResource("/bg.jpg");
         if (resource == null) {
             return;
         }
-        ImageCombiner combiner = new ImageCombiner(ImageIO.read(resource), OutputFormat.PNG);
-        combiner.setBackgroundBlur(30);
-        combiner.setCanvasRoundCorner(100);
+        BufferedImage read = ImageIO.read(resource);
+//        int width = read.getWidth() / 2;
+//        int height = read.getHeight() / 2;
+//        read = new BBImage(width, height, Color.WHITE).graphics().drawImage(read,0, 0, width, height);
+//        ;
+        ImageCombiner combiner = new ImageCombiner(read, read.getWidth(), read.getHeight(), ZoomMode.Height, OutputFormat.JPG);
+
+        combiner.combine();
+        combiner.save("./combiner.png");
         MessageChain chain = MessageUtils.newChain().plus(group.uploadImage(ExternalResource.create(combiner.getCombinedImageStream().readAllBytes())));
         group.sendMessage(chain);
 //        group.sendMessage(new PlainText("飘渺信息"));
