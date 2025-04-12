@@ -124,8 +124,8 @@ public class InfoCommand extends Utils {
 //        ;
         ImageCombiner combiner = new ImageCombiner(read, read.getWidth(), read.getHeight(), ZoomMode.Height, OutputFormat.JPG);
 
+        combiner.addTextElement("飘渺信息", 40, 1, 30).setColor(Color.RED).setCenter(true);
         combiner.combine();
-        combiner.save("./combiner.png");
         MessageChain chain = MessageUtils.newChain().plus(group.uploadImage(ExternalResource.create(combiner.getCombinedImageStream().readAllBytes())));
         group.sendMessage(chain);
 //        group.sendMessage(new PlainText("飘渺信息"));
