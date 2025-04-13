@@ -63,10 +63,10 @@ public class MistyRecordPlugin extends JavaPlugin {
                                 "misty/level",
                                 "misty/info"));
 
-            String messageString = message.contentToString();
-            switch (messageString.trim()) {
+            String messageString = message.contentToString().trim();
+            switch (messageString) {
                 case "#开始修仙", "#开始飘渺" -> StartXiuXianCommand.onCommand(group, user);
-                case "#飘渺面板", "#个人信息" -> InfoCommand.onCommand(group, user);
+                case "#飘渺面板", "#个人信息" -> InfoCommand.onCommand(group, user, messageString.replace("#飘渺面板 ", ""));
                 case "#我命由我不由天" -> RestartCommand.onCommand(group, user);
                 case "#魂归故里", "寂灭" -> SuicidedCommand.onCommand(group, user);
                 case "#飘渺告示", "飘渺帮助" -> HelpCommand.onCommand(group);

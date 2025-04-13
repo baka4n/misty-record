@@ -38,7 +38,7 @@ import java.util.List;
 
 public class InfoCommand extends Utils {
     @SneakyThrows
-    public static void onCommand(Group group, User user) {
+    public static void onCommand(Group group, User user, String arg) {
         Databases database = Database.databases.get(group.getId());
         Databases.Collections all = database.all;
         if (!checkRegistry(user, all.economy)) {
@@ -123,8 +123,14 @@ public class InfoCommand extends Utils {
 //        read = new BBImage(width, height, Color.WHITE).graphics().drawImage(read,0, 0, width, height);
 //        ;
         ImageCombiner combiner = new ImageCombiner(read, read.getWidth(), read.getHeight(), ZoomMode.Height, OutputFormat.JPG);
+        ImageCombiner frame = new ImageCombiner(789, 400, OutputFormat.PNG);
+        frame.addRectangleElement(0, 0, frame.getCanvasWidth(), frame.getCanvasHeight())
+                .setColor(new Color(Color.WHITE.getRed(), Color.WHITE.getGreen(), Color.WHITE.getBlue(), 128));
+        frame.setCanvasRoundCorner(40);
+        frame.addTextElement("飘渺信息", 40, 1, 20).setColor(Color.RED).setCenter(true);
+        frame.combine();
+        combiner.addImageElement(frame.getCombinedImage(), 50, 50).setCenter(true);
 
-        combiner.addTextElement("飘渺信息", 40, 1, 30).setColor(Color.RED).setCenter(true);
         combiner.combine();
         MessageChain chain = MessageUtils.newChain().plus(group.uploadImage(ExternalResource.create(combiner.getCombinedImageStream().readAllBytes())));
         group.sendMessage(chain);
